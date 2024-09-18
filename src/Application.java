@@ -36,7 +36,7 @@ public class Application {
                 while (!Validator.isOutputPathValid(console.nextLine())){
                     System.out.println("Введите путь для результата. Нажмите ENTER если такового нет (файл будет создан автоматически");
                 }
-
+                Chipper.getInstance().encrypt(Chipper.getInstance().getInputPath());
                 break;
             }
             case 2:{   //decrypt

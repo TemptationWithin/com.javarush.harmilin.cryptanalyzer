@@ -36,17 +36,21 @@ public class Validator {
         if (i == 0) {
             System.out.println("Ну с таким ключом мы далеко не уйдем. Наврядли вам нужна обычная копия файла..");
             return false;
-        }
-        else {
-            Chipper.chipper.setKey(i);
+        } else if (Math.abs(i) > Alphabet.ALPHABET.size()-1) {
+            System.out.println("Давайте отбросим полные обороты ключа. Ваш ключ эквивалентен: " + i%Alphabet.ALPHABET.size());
+            Chipper.getInstance().setKey(i%Alphabet.ALPHABET.size());
+            return true;
+        } else {
+            Chipper.getInstance().setKey(i);
             return true;
         }
     }
 
     public static boolean isInputFileExists(String s) {
         Path path = Path.of(s);
+        path = path.normalize();
         if (Files.isRegularFile(path)) {
-            Chipper.chipper.setInputPath(path);
+            Chipper.getInstance().setInputPath(path);
             return true;
         } else return false;
     }
@@ -56,15 +60,15 @@ public class Validator {
         // if entered same path or pressed enter - we create new file based on input absolute path
         if (s.isEmpty()|| path.startsWith(Chipper.getInstance().getInputPath())){
             StringBuilder string = new StringBuilder(String.valueOf(Chipper.getInstance().getInputPath()));
-            string.replace(string.length() - 5, string.length() - 1, "");
-            string = string.append("Encrypted.txt");
+            string.replace(string.length() - 4, string.length(), "Encrypted.txt");
             Chipper.getInstance().setOutputPath(Path.of(String.valueOf(string)));
-            System.out.println(Chipper.getInstance().getOutputPath()); //idk why "t" before encrypted
+            System.out.println(Chipper.getInstance().getOutputPath()); //console path
             return true;
         } else {
             path = path.normalize();
             if (path.isAbsolute()){
                 Chipper.getInstance().setOutputPath(path);
+                System.out.println(Chipper.getInstance().getOutputPath()); //checking path
                 return true;
             }
         }
