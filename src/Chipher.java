@@ -20,14 +20,7 @@ public class Chipher {
     }
 
     public File encrypt(Path encryptingPath) {
-        try {
-            if (Files.exists(getOutputPath())) {
-                Files.delete(getOutputPath());      //checking if file already exists
-            }
-            Files.createFile(getOutputPath());
-        } catch (IOException e) {
-            System.out.println("Файл не создался");
-        }
+        Validator.isOutputFileExistsAndCreateIfNot(Chipher.CHIPHER.getOutputPath());
 
         File encryptingFile = new File(String.valueOf(encryptingPath));
         File resultFile = new File(String.valueOf(getOutputPath()));
@@ -84,8 +77,9 @@ public class Chipher {
         return resultFile;
     }
 
-    public File decrypt(File file) {
-
+    public File decrypt(Path decryptingPath) {
+        File encryptingFile = new File(String.valueOf(decryptingPath));
+        File resultFile = new File(String.valueOf(getOutputPath()));
         return null;
     }
 

@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -80,6 +81,16 @@ public class Validator {
             Chipher.getInstance().setInputPath(path);
             return true;
         } else return false;
+    }
+    public static void isOutputFileExistsAndCreateIfNot(Path path){
+        try {
+            if (Files.exists(Chipher.getInstance().getOutputPath())) {
+                Files.delete(Chipher.getInstance().getOutputPath());      //checking if file already exists
+            }
+            Files.createFile(Chipher.getInstance().getOutputPath());
+        } catch (IOException e) {
+            System.out.println("Файл не создался");
+        }
     }
 
     public static boolean isOutputPathValid(String s) {
