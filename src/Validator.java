@@ -1,4 +1,5 @@
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 public class Validator {
@@ -26,7 +27,7 @@ public class Validator {
         }
     }
 
-    public static boolean isKeyValid(String number){
+    public static boolean isKeyValid(String number) {
         int i = 0;
         try {
             i = Integer.parseInt(number);
@@ -36,9 +37,9 @@ public class Validator {
         if (i == 0) {
             System.out.println("Ну с таким ключом мы далеко не уйдем. Наврядли вам нужна обычная копия файла..");
             return false;
-        } else if (Math.abs(i) > Alphabet.ALPHABET.size()-1) {
-            System.out.println("Давайте отбросим полные обороты ключа. Ваш ключ эквивалентен: " + i%Alphabet.ALPHABET.size());
-            Chipher.getInstance().setKey(i%Alphabet.ALPHABET.size());
+        } else if (Math.abs(i) > Alphabet.ALPHABET.size() - 1) {
+            System.out.println("Давайте отбросим полные обороты ключа. Ваш ключ эквивалентен: " + i % Alphabet.ALPHABET.size());
+            Chipher.getInstance().setKey(i % Alphabet.ALPHABET.size());
             return true;
         } else {
             Chipher.getInstance().setKey(i);
@@ -46,8 +47,8 @@ public class Validator {
         }
     }
 
-    public static String isKeyPositive(){
-        if (Chipher.getInstance().getKey() > 0){
+    public static String isKeyPositive() {
+        if (Chipher.getInstance().getKey() > 0) {
             return "Yes";
         } else return "No";
     }
@@ -61,10 +62,10 @@ public class Validator {
         } else return false;
     }
 
-    public static boolean isOutputPathValid(String s){
+    public static boolean isOutputPathValid(String s) {
         Path path = Path.of(s);
         // if entered same path or pressed enter - we create new file based on input absolute path
-        if (s.isEmpty()|| path.startsWith(Chipher.getInstance().getInputPath())){
+        if (s.isEmpty() || path.startsWith(Chipher.getInstance().getInputPath())) {
             StringBuilder string = new StringBuilder(String.valueOf(Chipher.getInstance().getInputPath()));
             string.replace(string.length() - 4, string.length(), "Encrypted.txt");
             Chipher.getInstance().setOutputPath(Path.of(String.valueOf(string)));
@@ -72,7 +73,7 @@ public class Validator {
             return true;
         } else {
             path = path.normalize();
-            if (path.isAbsolute()){
+            if (path.isAbsolute()) {
                 Chipher.getInstance().setOutputPath(path);
                 System.out.println(Chipher.getInstance().getOutputPath()); //checking path
                 return true;

@@ -36,11 +36,16 @@ public class Chipher {
             while (bufferedReader.ready()) {
                 char[] inputChars = bufferedReader.readLine().toCharArray();
                 char[] resultChars = new char[inputChars.length];
+                boolean upperCaseFlag = false;
                 for (int i = 0; i < inputChars.length; i++) {
-                    if (Alphabet.ALPHABET.contains((Character) inputChars[i])) {
+                    if (Character.isUpperCase(inputChars[i])){
+                        upperCaseFlag = true;
+                        inputChars[i] = Character.toLowerCase(inputChars[i]);
+                    }
+                    if (Alphabet.ALPHABET.contains(inputChars[i])) {
                         switch (Validator.isKeyPositive()) {
                             case "Yes": {
-                                if ((Alphabet.ALPHABET.indexOf(inputChars[i])+key) > (Alphabet.ALPHABET.size()-1)) {
+                                if ((Alphabet.ALPHABET.indexOf(inputChars[i]) + key) > (Alphabet.ALPHABET.size() - 1)) {
                                     resultChars[i] = (Character) Alphabet.ALPHABET.get(Alphabet.ALPHABET.indexOf(inputChars[i]) + key - Alphabet.ALPHABET.size());
                                 } else {
                                     resultChars[i] = (Character) Alphabet.ALPHABET.get(Alphabet.ALPHABET.indexOf(inputChars[i]) + key);
@@ -48,7 +53,7 @@ public class Chipher {
                                 break;
                             }
                             case "No": {
-                                if ((Alphabet.ALPHABET.indexOf(inputChars[i])) < Math.abs(getInstance().getKey())){
+                                if ((Alphabet.ALPHABET.indexOf(inputChars[i])) < Math.abs(getInstance().getKey())) {
                                     resultChars[i] = (Character) Alphabet.ALPHABET.get(Alphabet.ALPHABET.indexOf(inputChars[i]) + key + Alphabet.ALPHABET.size());
                                 } else {
                                     resultChars[i] = (Character) Alphabet.ALPHABET.get(Alphabet.ALPHABET.indexOf(inputChars[i]) + key);
@@ -56,12 +61,17 @@ public class Chipher {
                                 break;
                             }
                         }
+                    } else resultChars[i] = inputChars[i]; //non-alphabet symbols will be not changed.
+                    if (upperCaseFlag){
+                        resultChars[i] = Character.toUpperCase(resultChars[i]);
+                        inputChars[i] = Character.toUpperCase(inputChars[i]); //  - just to check is that feature working
                     }
+                    upperCaseFlag = false;
                 }
                 bufferedWriter.write(resultChars);
-                //console comparator:
-                //System.out.print("Input:  " + String.valueOf(inputChars)+"\n");
-                //System.out.print("Output: " + String.valueOf(resultChars)+"\n");
+                // console comparator of input-output (easy to compare texts):
+                // System.out.print("Input:  " + String.valueOf(inputChars)+"\n");
+                // System.out.print("Output: " + String.valueOf(resultChars)+"\n");
             }
         } catch (Exception e) {
             System.out.println("Что-то пошло не так с файлом");
