@@ -13,7 +13,7 @@ public class Application {
             System.out.println(Information.OPTIONS);
         }
 
-        Chipper chipper = Chipper.getInstance();
+        Chipher chipher = Chipher.getInstance();
 
         switch (Validator.getUserOptionChoice()){
             case 1:{  //encrypt
@@ -21,14 +21,14 @@ public class Application {
                 while (!Validator.isInputFileExists(console.nextLine())){
                     System.out.println("Не вижу такого файла. Попробуйте еще раз:");
                 }
-                System.out.println(chipper.getInputPath());//toDELETE (проверка ввода)
+                System.out.println(chipher.getInputPath());//toDELETE (проверка ввода)
 
                 System.out.println("Файл получен. Введите ключ:");                                          //key
                 while (!Validator.isKeyValid(console.nextLine())){
                     System.out.println("Вы должны ввести число отличное от нуля:");
                 }
 
-                System.out.println("Ключ:" + chipper.getKey());//toDELETE (проверка ввода)
+                System.out.println("Ключ:" + chipher.getKey());//toDELETE (проверка ввода)
 
                 System.out.println("Введите абсолютный путь для результата. Нажмите ENTER если такового нет (файл будет создан автоматически");
                 System.out.println("ВНИМАНИЕ! Если вы указали пусть к существующему файлу - он будет ПЕРЕЗАПИСАН!");
@@ -36,7 +36,7 @@ public class Application {
                 while (!Validator.isOutputPathValid(console.nextLine())){
                     System.out.println("Введите путь для результата. Нажмите ENTER если такового нет (файл будет создан автоматически");
                 }
-                Chipper.getInstance().encrypt(Chipper.getInstance().getInputPath());
+                Chipher.getInstance().encrypt(Chipher.getInstance().getInputPath());
                 break;
             }
             case 2:{   //decrypt
