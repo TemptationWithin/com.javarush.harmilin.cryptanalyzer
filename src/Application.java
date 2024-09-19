@@ -1,6 +1,5 @@
 import org.w3c.dom.ls.LSOutput;
 
-import javax.swing.*;
 import java.util.Scanner;
 
 public class Application {
@@ -20,7 +19,7 @@ public class Application {
 
         switch (Validator.getUserOptionChoice()) {
             case 1: {  //encrypt
-                System.out.println(Information.OPTION_ENCRYPT);   //path
+                System.out.println(Information.OPTION_ENCRYPT);                                             //path
                 while (!Validator.isInputFileExists(console.nextLine())) {
                     System.out.println("Не вижу такого файла. Попробуйте еще раз:");
                 }
@@ -36,9 +35,18 @@ public class Application {
                 System.out.println("Введите абсолютный путь для результата. Нажмите ENTER если такового нет (файл будет создан автоматически");
                 System.out.println("ВНИМАНИЕ! Если вы указали пусть к существующему файлу - он будет ПЕРЕЗАПИСАН!");
 
-                while (!Validator.isOutputPathValid(console.nextLine())) {
+                while (!Validator.isOutputPathValid(console.nextLine())) {                                  //outputPath
                     System.out.println("Введите путь для результата. Нажмите ENTER если такового нет (файл будет создан автоматически");
                 }
+
+                System.out.println("Хотите ли вы оставить неизвестные мне символы? Введите число:");
+                System.out.println("1. Да (такие символы запишутся без изменения)");
+                System.out.println("2. Нет (такие символы запишутся будут пропускаться)");
+                while (!Validator.isOptionForNonAlphabeticSymbolsValid(console.nextLine())) {                                  //outputPath
+                    System.out.println("Вы можете ввести только число:\n1 - для записи символовб которых я не знаю\n2 - для их пропуска ");
+                }
+
+
                 Chipher.getInstance().encrypt(Chipher.getInstance().getInputPath());
                 break;
             }

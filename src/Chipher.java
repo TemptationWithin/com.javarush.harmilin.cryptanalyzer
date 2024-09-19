@@ -8,6 +8,7 @@ public class Chipher {
     private int key;
     private Path inputPath;
     private Path outputPath;
+    private boolean skippingForeignSymbols;
 
     private static final Chipher CHIPHER = new Chipher();
 
@@ -34,17 +35,17 @@ public class Chipher {
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(encryptingFile));
              BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(resultFile))) {
             while (bufferedReader.ready()) {
-                char[] inputChars = bufferedReader.readLine().toCharArray();
+                char[] inputChars = bufferedReader.readLine().toCharArray();                //reading line from file
                 char[] resultChars = new char[inputChars.length];
                 boolean upperCaseFlag = false;
                 for (int i = 0; i < inputChars.length; i++) {
-                    if (Character.isUpperCase(inputChars[i])){
+                    if (Character.isUpperCase(inputChars[i])){                              //saving uppercase status
                         upperCaseFlag = true;
                         inputChars[i] = Character.toLowerCase(inputChars[i]);
                     }
-                    if (Alphabet.ALPHABET.contains(inputChars[i])) {
+                    if (Alphabet.ALPHABET.contains(inputChars[i])) {                        // encrypt for alphabetic symbols
                         switch (Validator.isKeyPositive()) {
-                            case "Yes": {
+                            case "Yes": { //encrypting when key > 0
                                 if ((Alphabet.ALPHABET.indexOf(inputChars[i]) + key) > (Alphabet.ALPHABET.size() - 1)) {
                                     resultChars[i] = (Character) Alphabet.ALPHABET.get(Alphabet.ALPHABET.indexOf(inputChars[i]) + key - Alphabet.ALPHABET.size());
                                 } else {
@@ -52,7 +53,7 @@ public class Chipher {
                                 }
                                 break;
                             }
-                            case "No": {
+                            case "No": {  //encrypting when key < 0
                                 if ((Alphabet.ALPHABET.indexOf(inputChars[i])) < Math.abs(getInstance().getKey())) {
                                     resultChars[i] = (Character) Alphabet.ALPHABET.get(Alphabet.ALPHABET.indexOf(inputChars[i]) + key + Alphabet.ALPHABET.size());
                                 } else {
@@ -61,14 +62,17 @@ public class Chipher {
                                 break;
                             }
                         }
-                    } else resultChars[i] = inputChars[i]; //non-alphabet symbols will be not changed.
+                    } else {
+                        if (isSkippingForeignSymbols())
+                        resultChars[i] = inputChars[i]; //non-alphabet symbols option
+                    }
                     if (upperCaseFlag){
                         resultChars[i] = Character.toUpperCase(resultChars[i]);
-                        inputChars[i] = Character.toUpperCase(inputChars[i]); //  - just to check is that feature working
+                        //inputChars[i] = Character.toUpperCase(inputChars[i]); //  - just to check is that feature working
                     }
                     upperCaseFlag = false;
                 }
-                bufferedWriter.write(resultChars);
+                bufferedWriter.write(resultChars);                                      // write result yo output file
                 // console comparator of input-output (easy to compare texts):
                 // System.out.print("Input:  " + String.valueOf(inputChars)+"\n");
                 // System.out.print("Output: " + String.valueOf(resultChars)+"\n");
@@ -81,6 +85,7 @@ public class Chipher {
     }
 
     public File decrypt(File file) {
+
         return null;
     }
 
@@ -106,5 +111,12 @@ public class Chipher {
 
     public void setOutputPath(Path outputPath) {
         this.outputPath = outputPath;
+    }
+    public boolean isSkippingForeignSymbols() {
+        return skippingForeignSymbols;
+    }
+
+    public void setSkippingForeignSymbols(boolean skippingForeignSymbols) {
+        this.skippingForeignSymbols = skippingForeignSymbols;
     }
 }

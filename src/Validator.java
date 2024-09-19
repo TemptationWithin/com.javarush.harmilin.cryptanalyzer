@@ -1,5 +1,4 @@
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 public class Validator {
@@ -20,6 +19,27 @@ public class Validator {
         switch (i) {
             case 1, 2, 3, 4: {
                 userOptionChoice = i;
+                return true;
+            }
+            default:
+                return false;
+        }
+    }
+
+    public static boolean isOptionForNonAlphabeticSymbolsValid(String number) {
+        int i = 0;
+        try {
+            i = Integer.parseInt(number);
+        } catch (NumberFormatException e) {
+            System.out.println("А я ведь просил число..");
+        }
+        switch (i) {
+            case 1: {
+                Chipher.getInstance().setSkippingForeignSymbols(true);
+                return true;
+            }
+            case 2: {
+                Chipher.getInstance().setSkippingForeignSymbols(false);
                 return true;
             }
             default:
