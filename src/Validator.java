@@ -98,7 +98,11 @@ public class Validator {
         // if entered same path or pressed enter - we create new file based on input absolute path
         if (s.isEmpty() || path.startsWith(Chipher.getInstance().getInputPath())) {
             StringBuilder string = new StringBuilder(String.valueOf(Chipher.getInstance().getInputPath()));
-            string.replace(string.length() - 4, string.length(), "Encrypted.txt");
+            if (userOptionChoice == 1){
+                string.replace(string.length() - 4, string.length(), "Encrypted.txt");
+            } else if (userOptionChoice == 2){
+                string.replace(string.length() - 4, string.length(), "Decrypted.txt");
+            }
             Chipher.getInstance().setOutputPath(Path.of(String.valueOf(string)));
             System.out.println(Chipher.getInstance().getOutputPath()); //console path
             return true;
