@@ -1,6 +1,9 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Validator {
 
@@ -18,7 +21,7 @@ public class Validator {
             System.out.println("А я ведь просил число..");
         }
         switch (i) {
-            case 1, 2, 3, 4: {
+            case 1, 2, 3, 4, 5: {
                 userOptionChoice = i;
                 return true;
             }
@@ -84,10 +87,11 @@ public class Validator {
     }
     public static void isOutputFileExistsAndCreateIfNot(Path path){
         try {
-            if (Files.exists(Chipher.getInstance().getOutputPath())) {
-                Files.delete(Chipher.getInstance().getOutputPath());      //checking if file already exists
+            path = path.normalize();
+            if (Files.exists(path)) {
+                Files.delete(path);      //checking if file already exists
             }
-            Files.createFile(Chipher.getInstance().getOutputPath());
+            Files.createFile(path);
         } catch (IOException e) {
             System.out.println("Файл не создался");
         }
@@ -115,5 +119,25 @@ public class Validator {
             }
         }
         return false;
+    }
+
+    public static boolean isBrutForceInputWordsValid(String string){
+        if (!string.isBlank()){
+            string = string.trim();
+            if ((string.contains(" ")) || (string.length() == 1)){
+                String[] strings = string.split(" ");
+                for (int i = 0; i < strings.length; i++) {
+                    strings[i] = strings[i].replaceAll(" ", "");
+                    if (strings[i].length() == 1 && i>0){                   // to look all 1-char articles as: I ->  _i_ (3chars)
+                        strings[i] = " " + strings[i] + " ";
+                    }
+                    //else if (strings[i].length() == 1 && i == 0) {        // to look all 1-char articles
+                    //    strings[i] = strings[i] + " ";                    //at the beginning of the row as: I ->  I_   (2chars)
+                    //}
+                    Chipher.getInstance().getBrutForceDecryptingWords().add(strings[i]);
+                }
+            } else Chipher.getInstance().getBrutForceDecryptingWords().add(string);
+            return true;
+        } else return false;
     }
 }
