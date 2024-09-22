@@ -19,7 +19,7 @@ public class Validator {
             System.out.println("А я ведь просил число..");
         }
         switch (i) {
-            case 1, 2, 3, 4, 5: {
+            case 1, 2, 3, 4, 5, 6: {
                 userOptionChoice = i;
                 return true;
             }
@@ -110,6 +110,8 @@ public class Validator {
                 string.replace(string.length() - 4, string.length(), "Encrypted.txt");
             } else if (userOptionChoice == 2 || userOptionChoice == 3){
                 string.replace(string.length() - 4, string.length(), "Decrypted.txt");
+            } else if (userOptionChoice == 4) {
+                string.replace(string.length() - 4, string.length(), "Analyzed.txt");
             }
             Chipher.getInstance().setOutputPath(Path.of(String.valueOf(string)));
             System.out.println(Chipher.getInstance().getOutputPath()); //console path

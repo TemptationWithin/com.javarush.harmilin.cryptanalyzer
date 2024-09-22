@@ -1,18 +1,22 @@
 import java.io.*;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.DecimalFormat;
+import java.util.*;
 
 //Singleton class
 public class Chipher {
 
     private int key;
     private int decryptKey;
+    private int statisticTrueKey;
     private Path inputPath;
     private Path outputPath;
     private boolean skippingForeignSymbols;
     private List<String> brutForceDecryptingWords = new ArrayList<>();
     List alphabet = Alphabet.ALPHABET_RUS;
+    List<String> popularParts_RUS = Alphabet.POPULAR_PARTS_RUS_2;
+    private List<Double> statiscticPercents = new ArrayList<>();
+    Map<Integer, Integer> matchesMap = new HashMap<>();
 
     private static final Chipher CHIPHER = new Chipher();
 
@@ -23,7 +27,7 @@ public class Chipher {
         return CHIPHER;
     }
 
-    public File encrypt(Path encryptingPath, int key) {
+    public File encrypt(Path encryptingPath, Path outputPath, int key) {
         Validator.isOutputFileExistsAndCreateIfNot(outputPath);
 
         File encryptingFile = new File(String.valueOf(encryptingPath));
@@ -33,7 +37,7 @@ public class Chipher {
              BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(resultFile))) {
             while (bufferedReader.ready()) {
                 char[] inputChars = bufferedReader.readLine().toCharArray();                //reading line from file
-                char[] resultChars = encryptProcess(inputChars);
+                char[] resultChars = encryptProcess(inputChars, key);                        // encrypting process
                 bufferedWriter.write(resultChars);                                      // write result to output file
             }
         } catch (Exception e) {
@@ -43,7 +47,7 @@ public class Chipher {
         return resultFile;
     }
 
-    public File decrypt(Path decryptingPath, int encryptKey) {
+    public File decrypt(Path decryptingPath, Path outputPath, int encryptKey) {
         Validator.isOutputFileExistsAndCreateIfNot(outputPath);
         decryptKey = encryptKey * (-1);
 
@@ -54,7 +58,7 @@ public class Chipher {
              BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(resultFile))) {
             while (bufferedReader.ready()) {
                 char[] inputChars = bufferedReader.readLine().toCharArray();                //reading line from file
-                char[] resultChars = decryptProcess(inputChars);
+                char[] resultChars = decryptProcess(inputChars, encryptKey);
                 bufferedWriter.write(resultChars);                                      // write result to output file
             }
         } catch (Exception e) {
@@ -64,7 +68,7 @@ public class Chipher {
         return resultFile;
     }
 
-    public File brutForceDecrypt() {
+    public File brutForceDecrypt(Path inputPath, Path outputPath) {
 
         Validator.isOutputFileExistsAndCreateIfNot(outputPath);
 
@@ -79,7 +83,7 @@ public class Chipher {
                     decryptKey = key * (-1);
                     boolean bingo = false;
 
-                    String resultString = String.valueOf(decryptProcess(inputChars));       //decryptProcess
+                    String resultString = String.valueOf(decryptProcess(inputChars, key));       //decryptProcess
 
                     for (String searchingString : brutForceDecryptingWords) {               // looking for matches
                         if (resultString.contains(searchingString.toLowerCase())) {
@@ -89,9 +93,9 @@ public class Chipher {
                         }
                     }
                     if (bingo) {
-                        Chipher.getInstance().decrypt(inputPath, key);                          // decrypt through "bingo" key
+                        Chipher.getInstance().decrypt(inputPath, outputPath, key);                          // decrypt through "bingo" key
                         break;
-                    } else if (key == alphabet.size()-1){
+                    } else if (key == alphabet.size() - 1) {
                         System.out.println("Не было найдено ни одного введенного слова.");
                         break;
                     }
@@ -104,7 +108,65 @@ public class Chipher {
         return resultFile;
     }
 
-    private char[] encryptProcess(char[] inputChars){
+    public void statisticalAnalysisDecrypt(Path inputPath, Path outputPath) {
+        Validator.isOutputFileExistsAndCreateIfNot(outputPath);
+
+        File decryptingFile = new File(String.valueOf(inputPath));
+
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(decryptingFile))) {
+            while (bufferedReader.ready()) {
+                char[] inputChars = bufferedReader.readLine().toCharArray();                //reading line from file
+                int matches = 0;
+                for (key = 0; key < alphabet.size(); key++) {
+                    decryptKey = key * (-1);
+                    matchesMap.put(key, matches);
+
+                    String resultString = String.valueOf(decryptProcess(inputChars, key));       //decryptProcess
+
+                    for (String searchingString : popularParts_RUS) {                      // looking for matches
+                        if (resultString.contains(searchingString.toLowerCase())) {
+                            matches++;
+                        }
+                    }
+                    matchesMap.put(key, matches);
+                    if (Collections.max(matchesMap.values()) == 0) {                                       // if no matches
+                        System.out.println("Не было найдено ни одного совпадения.");
+                        break;
+                    }
+                    matches = 0;
+                }
+
+                double sumMatches = 0;
+                for (Map.Entry<Integer, Integer> entry : matchesMap.entrySet()) {
+                    sumMatches = sumMatches + entry.getValue();
+                }
+
+                System.out.println("Обнаружено " + sumMatches + " совпадений:");          //total sum of matching parts
+                System.out.println("Ключ   | Совпадений | Вероятность");
+                System.out.println("---".repeat(10));
+                DecimalFormat decimalFormat = new DecimalFormat("#.##");
+                for (Map.Entry<Integer, Integer> entry : matchesMap.entrySet()) {
+                    statiscticPercents.add(entry.getValue()/sumMatches);
+                    System.out.println(entry.getKey() + "      |   " + entry.getValue()+ "   |  " + Double.valueOf(decimalFormat.format(entry.getValue()/sumMatches*100)) +"% |");
+                    System.out.println("---".repeat(10));
+                }
+                for (Map.Entry<Integer, Integer> entry : matchesMap.entrySet()) {
+                    if (entry.getValue().equals(Collections.max(matchesMap.values()))){
+                        statisticTrueKey = entry.getKey();
+                        break;
+                    }
+                }
+
+                decrypt(inputPath, outputPath, statisticTrueKey);
+            }
+        } catch (Exception e) {
+            System.out.println("Что-то пошло не так с файлом");
+            e.printStackTrace();
+        }
+
+    }
+
+    private char[] encryptProcess(char[] inputChars, int key) {
         boolean upperCaseFlag = false;
         char[] resultChars = new char[inputChars.length];
         for (int i = 0; i < inputChars.length; i++) {
@@ -143,7 +205,8 @@ public class Chipher {
         return resultChars;
     }
 
-    private char[] decryptProcess(char[] inputChars) {
+    private char[] decryptProcess(char[] inputChars, int key) {
+        int decryptKey = key * (-1);
         boolean upperCaseFlag = false;
         char[] resultChars = new char[inputChars.length];
         for (int i = 0; i < inputChars.length; i++) {
@@ -151,7 +214,7 @@ public class Chipher {
                 upperCaseFlag = true;
                 inputChars[i] = Character.toLowerCase(inputChars[i]);
             }
-            if (alphabet.contains(inputChars[i])) {                        // decrypt for alphabetic symbols
+            if (alphabet.contains(inputChars[i])) {                                  // decrypt for alphabetic symbols
                 switch (Validator.isKeyPositive()) {
                     case "Yes": { // decrypting when key > 0
                         if ((alphabet.indexOf(inputChars[i]) + decryptKey) < 0) {
@@ -187,9 +250,19 @@ public class Chipher {
     public void printInfo() {
         System.out.println("Входящий путь:   " + getInputPath());
         System.out.println("Путь для записи: " + getOutputPath());
-        System.out.println("Ключ шифрования: " + getKey());
+        if(!matchesMap.isEmpty()){
+            System.out.println("Ключ шифрования: " + statisticTrueKey);
+        }else System.out.println("Ключ шифрования: " + getKey());
         System.out.println("Ключ дешивровки: " + getDecryptKey());
-        System.out.print("Слова поиска brutForce: " + getBrutForceDecryptingWords());
+        if (!getBrutForceDecryptingWords().isEmpty()) {
+            System.out.print("Слова поиска brutForce: " + getBrutForceDecryptingWords());
+        }
+        if (!matchesMap.isEmpty()){
+
+            System.out.println("Статистический анализ показал что ");
+            System.out.println("Наилучший показатель: " + Collections.max(statiscticPercents)*100 + "% - " +
+                    "(" + Collections.max(matchesMap.values()) + "шт.) совпадений при ключе: " + statisticTrueKey);
+        }
     }
 
     public int getKey() {
